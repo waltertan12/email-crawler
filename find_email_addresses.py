@@ -26,7 +26,7 @@ def scrape(url):
 
   while len(to_visit) > 0:
     current_url = to_visit.popleft()
-    
+
     DRIVER.get(current_url)
     time.sleep(DELAY) # Wait for page to load
     soup = bs4.BeautifulSoup(DRIVER.page_source)
@@ -50,6 +50,7 @@ def parse_emails(soup, unique_emails):
   emails = EMAIL_REGEX.findall(soup.text)
   for email in emails:
     if email not in unique_emails:
+      unique_emails.add(email)
       print(email)
 
 def format_url(url):
