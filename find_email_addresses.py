@@ -10,58 +10,57 @@ import bs4, re, sys, time
 from selenium import webdriver 
 from collections import deque
 
-EMAIL_REGEX = re.compile(r'[\w+\-.]+@[a-z\d\-.]+\.[a-z]+')
-DRIVER = webdriver.Firefox()
-DELAY = 5
+class EmailScraper():
+  EMAIL_REGEX = re.compile(r'[\w+\-.]+@[a-z\d\-.]+\.[a-z]+')
+  DELAY = 5
 
-def scrape(url):
-  base_url = url
+  def __init__(self, base_url):
+    self.base_url = self.__format_url(base_url)
+    self.to_visit = deque([self.base_url])
+    self.visited = set()
+    self.unique_emails = set()
+    self.driver = webdriver.Firefox()
 
-  to_visit = deque([base_url])
+  def run(self):
+    print("Found the following emails:")
 
-  visited = set(base_url)
-  unique_emails = set()
+    while len(self.to_visit) > 0:
+      current_url = self.to_visit.popleft()
 
-  print("Found the following emails")
+      self.driver.get(current_url)
+      time.sleep(EmailScraper.DELAY) # Wait for page to load
+      soup = bs4.BeautifulSoup(self.driver.page_source)
 
-  while len(to_visit) > 0:
-    current_url = to_visit.popleft()
+      self.__parse_emails(soup)
+      self.__get_child_urls(soup)
 
-    DRIVER.get(current_url)
-    time.sleep(DELAY) # Wait for page to load
-    soup = bs4.BeautifulSoup(DRIVER.page_source)
+    self.driver.close()
 
-    parse_emails(soup, unique_emails)
-    get_child_urls(base_url, soup, to_visit, visited)
+  def __get_child_urls(self, soup):
+    href_tags = soup.select("a[href^=/]") # / for relative links
 
-  DRIVER.close()
+    for tag in href_tags:
+      full_url = self.base_url + tag["href"]
+      
+      if tag["href"] not in self.visited:
+        self.visited.add(full_url)
+        self.to_visit.append(full_url)
 
-def get_child_urls(base_url, soup, to_visit, visited):
-  href_tags = soup.select("a[href^=/]") # / for relative links
+  def __parse_emails(self, soup):
+    emails = EmailScraper.EMAIL_REGEX.findall(soup.text)
+    for email in emails:
+      if email not in self.unique_emails:
+        self.unique_emails.add(email)
+        print(email)
 
-  for tag in href_tags:
-    full_url = base_url + tag["href"]
-    
-    if tag["href"] not in visited:
-      visited.add(full_url)
-      to_visit.append(full_url)
+  def __format_url(self, url):
+    if "http://" not in url:
+      url = "http://" + url
 
-def parse_emails(soup, unique_emails):
-  emails = EMAIL_REGEX.findall(soup.text)
-  for email in emails:
-    if email not in unique_emails:
-      unique_emails.add(email)
-      print(email)
-
-def format_url(url):
-  if "http://" not in url:
-    url = "http://" + url
-
-  return url
+    return url
 
 if __name__ == '__main__':
   if len(sys.argv) > 1:
-    url = format_url(sys.argv[1])
-    scrape(url)
+    EmailScraper(sys.argv[1]).run()
   else:
     print("Please supply a URL")
