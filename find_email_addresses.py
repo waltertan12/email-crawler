@@ -1,14 +1,18 @@
 # Uses the following libraries:
-#   request to get HTML response
 #   bs4 to find new links
 #   re to create regular expression for emails
 #   sys to get command line arguments
+#   time to wait until HTML Document is fully loaded
 #   deque to store which URLs to visit and traverse page breadth-first
+#   selenium to receive HTML response
 #   collections to store visited URLs and discovered emails
-import requests, bs4, re, sys 
+import bs4, re, sys, time
+from selenium import webdriver 
 from collections import deque
 
-EMAIL_REGEX = r'[\w+\-.]+@[a-z\d\-.]+\.[a-z]+'
+EMAIL_REGEX = re.compile(r'[\w+\-.]+@[a-z\d\-.]+\.[a-z]+')
+DRIVER = webdriver.Firefox()
+DELAY = 5
 
 def scrape(url):
   base_url = url
@@ -18,14 +22,21 @@ def scrape(url):
   visited = set(base_url)
   unique_emails = set()
 
+  print("Found the following emails")
+
   while len(to_visit) > 0:
     current_url = to_visit.popleft()
-    get_child_urls
-    response = requests.get(current_url)
-    print(response.text)
+    
+    DRIVER.get(current_url)
+    time.sleep(DELAY) # Wait for page to load
+    soup = bs4.BeautifulSoup(DRIVER.page_source)
 
-def get_child_urls(base_url, response, to_visit, visited):
-  soup = bs4.BeautifulSoup(response.text)
+    parse_emails(soup, unique_emails)
+    get_child_urls(base_url, soup, to_visit, visited)
+
+  DRIVER.close()
+
+def get_child_urls(base_url, soup, to_visit, visited):
   href_tags = soup.select("a[href^=/]") # / for relative links
 
   for tag in href_tags:
@@ -35,8 +46,11 @@ def get_child_urls(base_url, response, to_visit, visited):
       visited.add(full_url)
       to_visit.append(full_url)
 
-def parse_emails():
-  pass
+def parse_emails(soup, unique_emails):
+  emails = EMAIL_REGEX.findall(soup.text)
+  for email in emails:
+    if email not in unique_emails:
+      print(email)
 
 def format_url(url):
   if "http://" not in url:
