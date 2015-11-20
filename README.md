@@ -6,7 +6,7 @@ It's dependent on the following external libraries:
 - Beautiful Soup
 - Selenium
 
-To install the libraries simply type the following in the terminal:
+To install the libraries, type the following in the terminal:
 ````bash
 $ sudo pip3 install bs4
 $ sudo pip3 install selenium
