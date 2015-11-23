@@ -17,7 +17,7 @@ $ sudo pip3 install selenium
 ````
 This implementation also requires Firefox to be installed on the computer. If you don't have Firefox, you can download it [here](https://www.mozilla.org/en-US/firefox/desktop/).
 
-#### Approach and Limitations
+### Approach and Limitations
 This crawler traverses the relative links of a URL. For example, given `website.com`, the crawler will only continue to search pages with URLs of the form `website.com/some/other/page` if there is a tag `<a href="/some/other/page"></a>`.
 
 Because this crawler relies on anchor tags with a hypertext reference beginning with a `/`, this crawler is unable to pick up clickable links provided by some front-end frameworks. More specifically, it is unable to traverse `ng-click="ChanceRoute("some/route")"` and hash routes `<a href="#/some/route"></a>`.
