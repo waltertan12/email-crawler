@@ -31,12 +31,12 @@ class EmailScraper():
       time.sleep(EmailScraper.DELAY) # Wait for page to load
       soup = bs4.BeautifulSoup(self.driver.page_source)
 
-      self.__parse_emails(soup)
-      self.__get_child_urls(soup)
+      self._parse_emails(soup)
+      self._get_child_urls(soup)
 
     self.driver.close()
 
-  def __get_child_urls(self, soup):
+  def _get_child_urls(self, soup):
     href_tags = soup.select("a[href^=/]") # / for relative links
 
     for tag in href_tags:
@@ -46,14 +46,14 @@ class EmailScraper():
         self.visited.add(full_url)
         self.to_visit.append(full_url)
 
-  def __parse_emails(self, soup):
+  def _parse_emails(self, soup):
     emails = EmailScraper.EMAIL_REGEX.findall(soup.text)
     for email in emails:
       if email not in self.unique_emails:
         self.unique_emails.add(email)
         print(email)
 
-  def __format_url(self, url):
+  def _format_url(self, url):
     if "http://" not in url:
       url = "http://" + url
 
