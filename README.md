@@ -1,6 +1,6 @@
 # Email Scraper
 
-#### Description
+### Description
 
 A command line utility to scrape emails from a web page using Python 3.4.3. You can download Python3 [here](https://www.python.org/downloads/). If you're not sure what version of Python you're using, type `$ python --version` or `$ python3 --version` in the terminal.
 
@@ -8,7 +8,7 @@ It's dependent on the following external libraries:
 - Beautiful Soup
 - Selenium
 
-#### Setup
+### Setup
 
 To install the libraries, type the following in the terminal:
 ````bash
@@ -22,7 +22,7 @@ This crawler traverses the relative links of a URL. For example, given `website.
 
 Because this crawler relies on anchor tags with a hypertext reference beginning with a `/`, this crawler is unable to pick up clickable links provided by some front-end frameworks. More specifically, it is unable to traverse `ng-click="ChanceRoute("some/route")"` and hash routes `<a href="#/some/route"></a>`.
 
-#### Parallelization
+### Parallelization
 **Using EmailScraper**
 
 Here are some considerations trying parallelizing the EmailScraper class (runners, in the context, is an instance of the EmailScraper):
@@ -35,8 +35,8 @@ In a simple approach, we could create a set number of EmailScraper instances eac
 
 Deciding the starting URLs of each EmailScraper is fairly challenging. The goal might be to have each one start as far away from each other as possible. However, this requires some knowledge of the web and might not be feasible.
 
-Memory may also prove to be an issue. The Hash Set storing all unique URLs would potentially have to store every URL on the web. Storing all that information in Python memory does not sound like a great idea. I have not really worked with Redis or MongoDB, but storing URLs in a database might be more reasonable. Compressing the URLs might be a viable option.
+Memory may also prove to be an issue. The Hash Set storing all unique URLs would potentially have to store every URL on the web. Storing all that information in Python memory does not sound like a great idea. I have not really worked with Redis or MongoDB, but storing URLs in a database might be more reasonable. Compressing the URLs might also be a viable option to reduce memory.
 
-** Other Methods **
+**Other Methods**
 
 The previous approach relies on using the EmailScraper class. However, there might be a better method that has a completely different approach. For example, maybe instead of having each individual crawler decide which URLs it needs to crawl, we could create a dispatcher which gives the crawlers a list of URLs scrape.
